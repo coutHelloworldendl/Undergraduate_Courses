@@ -1,0 +1,119 @@
+\documentclass[11pt]{article}
+\usepackage[UTF8]{ctex}
+\usepackage[a4paper]{geometry}
+\geometry{left=2.0cm,right=2.0cm,top=2.5cm,bottom=2.5cm}
+
+\usepackage{comment}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{diagbox}
+\usepackage{amsmath,amsfonts,graphicx,amssymb,bm,amsthm}
+%\usepackage{algorithm,algorithmicx}
+\usepackage[ruled]{algorithm2e}
+\usepackage[noend]{algpseudocode}
+\usepackage{fancyhdr}
+\usepackage{tikz}
+\usepackage{graphicx}
+\usetikzlibrary{arrows,automata}
+\usepackage{hyperref}
+\usepackage{float}
+\usepackage{tikz}
+\usepackage{tikz-qtree}
+
+\setlength{\headheight}{14pt}
+\setlength{\parindent}{0 in}
+\setlength{\parskip}{0.5 em}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem*{definition*}{Definition}
+
+\newcommand{\mP}{\mathbf{P}}
+\newcommand{\NP}{\mathbf{NP}}
+\newcommand{\NPC}{\mathbf{NP}\text{-complete}}
+\newcommand{\coNP}{\mathbf{coNP}}
+\newcommand{\PSPACE}{\mathbf{PSPACE}}
+\newcommand{\PSPACEC}{\mathbf{PSPACE}\text{-complete}}
+\newcommand{\EXP}{\mathbf{EXP}}
+\newcommand{\NEXP}{\mathbf{NEXP}}
+\newcommand{\NL}{ \mathbf{NL}}
+\newcommand{\NLC}{\mathbf{NL}\text{-complete}}
+
+\newenvironment{problem}[2][Problem]{\begin{trivlist}
+		\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\hfill$\blacktriangleleft$\end{trivlist}}
+\newenvironment{answer}[1][Answer]{\begin{trivlist}
+		\item[\hskip \labelsep {\bfseries #1.}\hskip \labelsep]}{\hfill$\lhd$\end{trivlist}}
+
+\begin{document}
+	\pagestyle{fancy}
+	\lhead{Peking University}
+	\chead{}
+	\rhead{Introduction to the Theory of Computation, 2024 Spring}
+	\begin{center}
+		{\LARGE \bf Homework 5}\\
+		{Due: 2024-5-21 23:59 \quad$|$\quad 5 Problems, 100 Pts}
+		{Name: 胡宇阳, ID: 2200013065}
+	\end{center}
+	\begin{problem}{1.(16 points)}
+		Prove that every function $f : \{0,1\}^n\rightarrow\{0,1\}$ can be computed by a circuit of size less than $10\cdot2^n$.
+	\end{problem}
+	\begin{answer}
+		设 circuit 大小为 $a_n$, 即证 $a_n<10\cdot2^n$
+		
+		\textcircled{1} 使用归纳构造, 在 $n=1$ 时, 若 $(0,1),(1,0)$ 则用一个非门, 若 $(0,0),(1,1)$ 则直接输出, 若 $(0,0),(1,0)$, 则与 $0$ 通过与门. 若 $(0,1),(1,1)$ 则与 $1$ 通过或门. 总共不超过 $2$ 个门, $2<10\cdot2^1$.
+		
+		\textcircled{2} 若 $<n-1$ 时均成立, 下计算为 $n$ 的时候, 假设我们要计算 $x_1x_2\cdots x_n$则存在节点数 $\leq 10\cdot2^n$ 的两个 circuit $g_0,g_1$ 使得 $g_0(x_1x_2\cdots x_{n-1})=f(x_1x_2\cdots x_{n-1}0),g_1(x_1x_2\cdots x_{n-1})=f(x_1x_2\cdots x_{n-1}1)$.
+		
+		则可以构建如下的网络 $f(x_1x_2\cdots x_n)=(g_0(x_1x_2\cdots x_{n-1})\wedge\neg x_n)\vee(g_1(x_1x_2\cdots x_{n-1})\wedge x_n)$, 增加了 $5$ 个单元.
+		
+		所以 $a_n=2a_{n-1}+5<2^{n-1}a_1+5\cdot2^{n-1}-5=10\cdot2^n-5<10\cdot2^n$
+	\end{answer}
+	\begin{problem}{2.(21 points)}
+		 Improve this bound to show that every function $f : \{0,1\}^n\rightarrow\{0,1\}$ can be computed by a circuit of size less than $1000\cdot2^n/n$.
+	\end{problem}
+	\begin{answer}
+		设 circuit 大小为 $a_n$, 即证 $a_n<1000\cdot2^n/n$
+		
+		\textcircled{1} 使用归纳构造, 令 $t=\log n-1$, 首先由上题, 可构造 $2^{2^t+t}$ 个单元的电路, 每一个电路构造一个 $\{0,1\}^t\rightarrow{0,1}$ 的映射. 然后使用归纳计算剩下 $n-t$ 位, 在归纳到最后 $t$ 位时, 直接在构造好的电路中进行选取即可.
+		
+		\textcircled{2} 在递归的过程中, 由上题, 每次会多出来 $5$ 个, 所以最终节点数为 $5(2^{n-t}-1)+2^{2^t+t}$, 代入得 $a_n\leq 5\cdot2^{n-\log n+1}+2^{\log n+\frac{n}{2}-1}= 10\cdot\frac{2^n}{n}+\frac{n}{2}\cdot2^{\frac{n}{2}}<15\cdot\frac{2^n}{n}$
+	\end{answer}
+	\begin{problem}{3.(21 points)}
+		Show that for every $k > 0$ that PH contains languages whose circuit complexity is $\Omega(n^k)$.
+	\end{problem}
+	\begin{answer}
+		令 $L_k\in\text{PH}$, 即证 $L_k$ 的 circuit complexity 为 $\Omega(n^k)$
+		
+		如下定义 $L_k:w\in L_k\Leftrightarrow\exists w_1\in \{0,1\}^{q(|w|)},\forall w_2\in \{0,1\}^{q(|w|)},\exists w_3\in \{0,1\}^{q(|w|)},\forall w_4\in \{0,1\}^{q(|w|)},\exists w_5\in \{0,1\}^{q(|w|)},\forall w_6\in \{0,1\}^{q(|w|)}, M(w,w_1,w_2,w_3,w_4,w_5,w_6)=1$,
+		
+		其中 $q$ 为多项式函数, $w_1$ 编码大小为 $|w|^{k+1}$ 的电路, $w_2$ 编码大小为 $|w|^k$ 的电路, $w_4$ 编码大小为 $|w|^{k+1}$ 的电路, $w_4$ 编码大小为 $|w|^{k}$ 的电路, $M(w,w_1,w_2,w_3,w_4,w_5,w_6)=1\Leftrightarrow w_1(w)=1\wedge |w_1|\geq |w|^{k+1}\wedge |w_2|\leq |w|^k\wedge |w_3|=|w|\wedge |w_4|\geq |w|^{k+1}\wedge|w_5|\leq|w|^k\wedge|w_6|=|w|\wedge w_1(w_3)\neq w_2(w_3)\wedge w_4(w_6)=w_5(w_6)\wedge w_4$ 字典序小于 $w_1$.
+		
+		则所有 $|w|^{k}$ 都无法判定, 且字典序在 $w_1$ 以前的都可以用 $|w|^{k}$ 替代. 所以 complexity 为 $\Omega(n^k)$.
+	\end{answer}
+	\begin{problem}{4.(21 points)}
+		Show that if P = NP, then there is a language in EXP that requires circuits of size $2^n/n$.
+	\end{problem}
+	\begin{answer}
+		定义如下的语言 $L$: $w\in L\Leftrightarrow\exists w_1\in \{0,1\}^{e(|w|)},\forall w_2\in \{0,1\}^{e(|w|)},\exists w_3\in \{0,1\}^{e(|w|)},\forall w_4\in \{0,1\}^{e(|w|)},\exists w_5\in \{0,1\}^{e(|w|)},\forall w_6\in \{0,1\}^{e(|w|)}, M(w,w_1,w_2,w_3,w_4,w_5,w_6)=1$,
+		
+		其中 $q$ 为指数级函数, $w_1$ 编码大小为 $2^{|w|}/10|w|$ 的电路, $w_2$ 编码大小小于 $2^{|w|}/10|w|$ 的电路, $w_4$ 编码大小为 $2^{|w|}/10|w|$ 的电路, $w_4$ 编码大小小于为 $2^{|w|}/10|w|$ 的电路, $M(w,w_1,w_2,w_3,w_4,w_5,w_6)=1\Leftrightarrow w_1(w)=1\wedge |w_1|\geq 2^{|w|}/10|w|\wedge |w_2|< 2^{|w|}/10|w|\wedge |w_3|=|w|\wedge |w_4|\geq 2^{|w|}/10|w|\wedge|w_5|<2^{|w|}/10|w|\wedge|w_6|=|w|\wedge w_1(w_3)\neq w_2(w_3)\wedge w_4(w_6)=w_5(w_6)\wedge w_4$ 字典序小于 $w_1$.
+		
+		由于必有函数需要 $2^n/10n$ 的 circuit, 所以必然存在 $w\in L$.
+		
+		若 P=NP, 则 P=PH, 则 EXP 大小的输入也可以在 EXP 时间内解决, 且以上的电路 size 至少为 $2^n/10n$.
+	\end{answer}
+	\begin{problem}{5.(21 points)}
+		 Show that uniform NC$^1\subseteq$ L. Then show that PSPACE $\neq$ uniform NC$^1$.
+	\end{problem}
+	\begin{answer}
+		即证可以用 log-space TM 来模拟 NC$^1$ 的电路.
+		
+		由 NC$^1$ 的性质, NC$^1$ 的 size 为 $O(n^k)$, depth 为 $O(\log n)$, 则使用一个 TM $M$, 其在输入只带上运行深度优先计算, 由于每个节点只有两个子节点, 则每到非叶节点时先计算左子树, 再计算右子树, 然后进行合并. 由于这种策略下每次记录的数据所在树的层次均不同, 所以一共使用 $\log n$ 的空间来计算. 所以 NC$^1\subseteq$ L. 
+		
+		由 SPACE hierachy theorem, L $\subsetneq$ PSPACE, 所以 PSPACE $\neq$ uniform NC$^1$.
+	\end{answer}
+\end{document}

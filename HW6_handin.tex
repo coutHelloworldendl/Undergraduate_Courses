@@ -1,0 +1,152 @@
+\documentclass[11pt]{article}
+\usepackage[UTF8]{ctex}
+\usepackage[a4paper]{geometry}
+\geometry{left=2.0cm,right=2.0cm,top=2.5cm,bottom=2.5cm}
+
+\usepackage{comment}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{diagbox}
+\usepackage{amsmath,amsfonts,graphicx,amssymb,bm,amsthm}
+\usepackage[ruled]{algorithm2e}
+\usepackage[noend]{algpseudocode}
+\usepackage{fancyhdr}
+\usepackage{tikz}
+\usepackage{graphicx}
+\usetikzlibrary{arrows,automata}
+\usepackage{hyperref}
+\usepackage{float}
+\usepackage{tikz}
+\usepackage{tikz-qtree}
+
+\setlength{\headheight}{14pt}
+\setlength{\parindent}{0 in}
+\setlength{\parskip}{0.5 em}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem*{definition*}{Definition}
+
+\newcommand{\mP}{\mathbf{P}}
+\newcommand{\NP}{\mathbf{NP}}
+\newcommand{\NPC}{\mathbf{NP}\text{-complete}}
+\newcommand{\coNP}{\mathbf{coNP}}
+\newcommand{\PSPACE}{\mathbf{PSPACE}}
+\newcommand{\PSPACEC}{\mathbf{PSPACE}\text{-complete}}
+\newcommand{\EXP}{\mathbf{EXP}}
+\newcommand{\NEXP}{\mathbf{NEXP}}
+\newcommand{\NL}{ \mathbf{NL}}
+\newcommand{\NLC}{\mathbf{NL}\text{-complete}}
+
+\newenvironment{problem}[2][Problem]{\begin{trivlist}
+		\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\hfill$\blacktriangleleft$\end{trivlist}}
+\newenvironment{answer}[1][Answer]{\begin{trivlist}
+		\item[\hskip \labelsep {\bfseries #1.}\hskip \labelsep]}{\hfill$\lhd$\end{trivlist}}
+
+\begin{document}
+	\pagestyle{fancy}
+	\lhead{Peking University}
+	\chead{}
+	\rhead{Introduction to the Theory of Computation, 2024 Spring}
+	\begin{center}
+		{\LARGE \bf Homework 6}\\
+		{Due: 2024-6-4 23:59 \quad$|$\quad 5 Problems, 100 Pts}
+		{Name: 胡宇阳, ID: 2200013065}
+	\end{center}
+	\begin{problem}{1.(12分)}
+		Learn the definition of P-complete (Arora Textbook def 6.28). Show that if $L$ is P-complete then $L \in $ NC iff P = (uniform) NC.
+	\end{problem}
+	\begin{answer}
+		\textcircled{1} $"\Rightarrow"$
+		
+		首先 polylog-space circuit 可以模拟 poly-time TM, 所以 (uniform) NC $\subseteq$ P.
+		
+		然后要证 P $\subseteq$ NC, 由条件, 即证存在一个 log-space TM, 可以将从 P 到 L 的 log-space 规约过程表达为一个 polylog-depth circuit. 
+		
+		对于 log-space 规约过程, 其对应的图灵机为 log-space TM, 设该过程为 $\{0,1\}^n\rightarrow\{0,1\}^m$, 由于 $m=poly(n)$, 所以只需要说明 $\{0,1\}^n\rightarrow\{0,1\}$ 可以用 polylog-depth circuit 表达即可.
+		
+		对于 log-space TM, 其 configuration graph 的大小 $|C|\sim O(n)$, 先用多项式算出 configuration graph 的转移矩阵, 然后使用 polylog-depth circuit 在多项式时间内进行矩阵的快速幂 (由于快速幂为 log 的步骤数所以 depth 为 log), 最后验证是否能从起点到终点即可. 
+		
+		\textcircled{2} $"\Leftarrow"$
+		
+		$\because$ L $\in$ P, P = (uniform) NC, $\therefore L\in$ NC.
+	\end{answer}
+	\begin{problem}{2.(24分)}
+		Show that the majority function cannot be computed in AC$^0$.
+		
+		The majority function $maj : \{0, 1\}^n\rightarrow\{0, 1\}$: outputs $1$ if the number of $1$s in the input is at least $n/2$; outputs $0$ otherwise.
+	\end{problem}
+	\begin{answer}
+		定义 $MAXk$ function $MAXk:\{0,1\}^n\rightarrow\{0,1\}$: 当 1 的数量大于等于 $k$ 时输出 1, 反之输出 0.
+		
+		定义 $MINk$ function $MINk:\{0,1\}^n\rightarrow\{0,1\}$: 当 1 的数量小于等于 $k$ 时输出 1, 反之输出 0.
+		
+		\textcircled{1} $maj\in$ AC$^0\rightarrow MAXk\in$ AC$^0$.
+		
+		设电路族 $\{C_i\}$ 判定 $maj$ 问题, 则对于长度为 $n$ 的字符串 $s$, 若 $n\geq 2k$, 则输出 $C_{2n-2k}(1^{n-k}s)$, 否则输出 $C_{2k}(0^{2k-n}s)$, 记此电路为 $C^1$.
+		
+		则 $depth(C^1_n)\leq1+depth(C_{\max(2k,2n-2k)}),size(C^1_n)\leq\max(n-k,2k-n)+size(C_{\max(2k,2n-2k)})$, 依旧为 AC$^0$.
+		
+		同理取反, 可得 $MINk\in$ AC$^0$
+		
+		\textcircled{2} $MAXk,MINk\in$ AC$^0\rightarrow XOR\in$ AC$^0$.
+		
+		则对于长度为 $n$ 的字符串 $s$, $XOR(s)=\bigvee\limits_{i=2k,k\in\mathbb{Z},0\leq k\leq N}(MAXk_{i}(s)\wedge MINk_{i}(s))$, 记此电路为 $C^2$
+		
+		则 $depth(C^2_n)=2+depth(C^1_n),size(C^2_n)=nsize(C^1_n)+n+1$, 依旧为 AC$^0$.
+		
+		然而 $XOR$ 不是 AC$^0$, 所以 $maj$ 不是 AC$^0$.
+	\end{answer}
+	\begin{problem}{3.(20分)}
+		Show that one can efficiently simulate choosing a random number from $1$ to $N$ (denote this set as $[N]$) using coin tosses. That is, show that for every $N$ and $\delta > 0$, there is a probabilistic algorithm A running in poly$(\log N \log(1/\delta))$ time with output in $\{1, 2,\cdots N, ?\}$ such that
+		
+		(a) conditioned on not outputting ?, A’s output is uniformaly distributed in $[N]$ and
+		
+		(b) the probability that A outputs ? is at most $\delta$.
+	\end{problem}
+	\begin{answer}
+		\textcircled{1} 算法设计:
+		
+		重复如下过程 $\log(\frac{1}{\delta})$ 次: 投 $\lfloor\log N\rfloor$ 次骰子, 记为 $x_1,x_2,\cdots,x_{\lfloor\log N\rfloor}$, 将这 $\lfloor\log N\rfloor$ 个数按照二进制合成数字 $x_1x_2\cdots x_{\lfloor\log N\rfloor}$, 取第一个 $1\sim N$ 中的数字.
+		
+		\textcircled{2} 正确性证明:
+		
+		对于 $N$, 二进制数的范围为 $0\sim 2^{\lfloor\log N\rfloor+1}$, 所以 $P(x\in\{1,\cdots,N\})=\frac{N}{2^{\lfloor\log N\rfloor+1}}\geq\frac{1}{2}$
+		
+		$P(x)=\frac{1}{2^{\lfloor\log N\rfloor+1}}$ 为均匀分布, $P(?)=1-\frac{1}{2}^{\log(\frac{1}{\delta})}=\delta$.
+	\end{answer}
+	\begin{problem}{4.(22分)}
+		Learn the definition of randomized polynomial time reduction and the definition of BP$\cdot$NP in Arora Textbook section 7.6. and solve the following problem.
+		
+		A nondeterministic circuit $C$ has two inputs $x, y$. We say that $C$ accepts $x$ iff there exists $y$ such that $C(x, y) = 1$. The size of the circuit is measured as a function of $|x|$. Let NP/poly be the languages that are decided by polynomial size nondeterministic circuits. Show that BP·NP $\subseteq$ NP/poly.
+	\end{problem}
+	\begin{answer}
+		对于 $L\in$ BP$\cdot$NP, $\exists$ PTM $M$, $\forall x,P(L(M(r,x))=3SAT(x))\geq\frac{2}{3}$
+		
+		然后进行 Chernoff Boosting, 在多项式时间内将概率提升到 $1-(1/2)^{2n}$
+		
+		$\therefore P(\exists r,L(M(x))\neq3SAT(r,x))\leq(1/2)^n<1$
+		
+		$\therefore \forall n,\exists r,L(M(r,x))=3SAT(r,x))$
+		
+		对于每一个 $n$, 使用 $r$ 来构造电路 $C_n$
+		
+		而 3SAT 有多项式时间的验证机, 所以可以构造电路 $\{C_n^\prime\}$, 让 $\{C_n^\prime\}$ 接受 $\{C_n\}$ 的输入
+		
+		$\therefore L\in$ NP/poly.
+	\end{answer}
+	\begin{problem}{5.(22分)}
+		Show that BPL $\subseteq$ P.
+	\end{problem}
+	\begin{answer}
+		若 $L\in$ BPL, 则 $\exists O(\log n)$ 空间的 PTM M, $Pr(M(x)=L(x))\geq\frac{2}{3}$. 即证可以使用 poly-time TM 来模拟 PTM. PTM 的运行时间记为 $t(n)$.
+		
+		M 的算法如下: 先计算 BPL 的转移矩阵 $B$, 其中 $B_{ij}=P(q_i,q_j)$, 然后用快速幂算法计算 $B^{t(n)}$, 然后验证 $P(q_{start},q_{end})$ 是否 $\geq\frac{2}{3}$, 若是则 accept, 否则 reject.
+		
+		计算转移矩阵时需要遍历每一对 configuration 上的状态, 时间复杂度为 $O(|C|^2)$, 而快速幂计算复杂度为 $O(n^3\log(t(n)))$, 也为 poly. 所以 BPL $\subseteq$ P.
+	\end{answer}
+\end{document}

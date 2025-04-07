@@ -1,0 +1,206 @@
+\documentclass[11pt]{article}
+\usepackage[UTF8]{ctex}
+\usepackage[a4paper]{geometry}
+\geometry{left=2.0cm,right=2.0cm,top=2.5cm,bottom=2.5cm}
+
+\usepackage{comment}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{diagbox}
+\usepackage{amsmath,amsfonts,graphicx,amssymb,bm,amsthm}
+%\usepackage{algorithm,algorithmicx}
+\usepackage[ruled]{algorithm2e}
+\usepackage[noend]{algpseudocode}
+\usepackage{fancyhdr}
+\usepackage{tikz}
+\usepackage{graphicx}
+\usetikzlibrary{arrows,automata}
+\usepackage{hyperref}
+\usepackage{float}
+\usepackage{tikz}
+\usepackage{tikz-qtree}
+
+\setlength{\headheight}{14pt}
+\setlength{\parindent}{0 in}
+\setlength{\parskip}{0.5 em}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem*{definition*}{Definition}
+
+\newcommand{\mP}{\mathbf{P}}
+\newcommand{\NP}{\mathbf{NP}}
+\newcommand{\NPC}{\mathbf{NP}\text{-complete}}
+\newcommand{\coNP}{\mathbf{coNP}}
+\newcommand{\PSPACE}{\mathbf{PSPACE}}
+\newcommand{\PSPACEC}{\mathbf{PSPACE}\text{-complete}}
+\newcommand{\EXP}{\mathbf{EXP}}
+\newcommand{\NEXP}{\mathbf{NEXP}}
+\newcommand{\NL}{ \mathbf{NL}}
+\newcommand{\NLC}{\mathbf{NL}\text{-complete}}
+
+\newenvironment{problem}[2][Problem]{\begin{trivlist}
+		\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\hfill$\blacktriangleleft$\end{trivlist}}
+\newenvironment{answer}[1][Answer]{\begin{trivlist}
+		\item[\hskip \labelsep {\bfseries #1.}\hskip \labelsep]}{\hfill$\lhd$\end{trivlist}}
+
+\begin{document}
+	\pagestyle{fancy}
+	\lhead{Peking University}
+	\chead{}
+	\rhead{Introduction to the Theory of Computation, 2024 Spring}
+	\begin{center}
+		{\LARGE \bf Homework 4}\\
+		{Due: 2024-5-5 23:59 \quad$|$\quad 6 Problems, 100 Pts}
+		{Name: 胡宇阳, ID: 2200013065}
+	\end{center}
+	\begin{problem}{1.(16 points)}
+		A cut in an undirected graph is a seperation of the vertices $V$ into two disjoint subsets $S$ and $T$. The size of a cut is the number of edges that have one endpoint in $S$ and the other in $T$. Let
+		\begin{align*}
+			\textbf{MAX-CUT} = \{ \left\langle G,k \right\rangle \mid G \text{ has a cut of size $k$ or more }\}.
+		\end{align*}
+		\begin{itemize}
+			\item (6 points) Give a randomized algorithm that, given an graph $G$ such that $G$ has a cut of size $k$ or more, outputs a cut of expected size at least $k/2$. 
+			\item (10 points) Show that \textbf{MAX-CUT} is $\NPC$.(Hint: Show that $\neq$SAT $\le_p$ \textbf{MAX-CUT}.) 
+		\end{itemize}
+	\end{problem}
+	\begin{answer}
+		(1) 对于每一个点等概率地分给 $S$ 和 $T$, 则对于每一条边 $e=(v_1,v_2)$, 有 $P(v_1\in S,v_2\in T\vee v_1\in T,v_2\in S)=\frac{1}{2}$, 由于 $|V|\geq k$, 所以 $E[(v_1,v_2)\in e,v_1\in S,v_2\in T\vee v_1\in T,v_2\in S]\geq\frac{k}{2}$.
+		
+		(2) \textcircled{1} 对于 $<G,k>\in\textbf{MAX-CUT}$, 其 certificate 为对 $G$ 中每个点的一组赋值, 而判定机需要遍历每一条边, 并判断是否存在 $k$ 条割. 时间复杂度为 $O(V)$, 为多项式. 所以 $\textbf{MAX-CUT}\in \NP$.
+		
+		\textcircled{2} 下构造多项式规约 $f:\neq\text{SAT}\rightarrow \langle G,k\rangle$, 使得对于任意可满足的 $s\in\neq\text{SAT}$, $f(s)\in\textbf{MAX-CUT}$.
+		
+		对于 $s\in\neq\text{SAT}$, 不妨设 $s=\bigwedge\limits_{i=1}^{n}{(a_{i1}\vee a_{i2}\vee a_{i3})}$, 其中一共有 $m$ 种变量 $a_1,\cdots,a_m$. 令 $f(s)=\langle G,m+5n\rangle$
+		
+		其中, $G=(V_1\cup V_2,E)$, $V_1=\{v_{a_1},v_{\bar{a_1}},v_{a_2},v_{\bar{a_2}},\cdots,v_{a_m},v_{\bar{a_m}}\}$, $V_2=\bigcup\limits_{i=1}^{n}\{v_{a_{i1}},v_{a_{i2}},v_{a_{i3}}\}$
+		
+		$\forall i\in\{1,2,\cdots,m\},(v_{ai},v_{\bar{a_i}})\in E,\forall i\in\{1,2,\cdots,n\},(v_{a_{i1}},v_{a_{i2}}),(v_{a_{i1}},v_{a_{i3}}),(v_{a_{i2}},v_{a_{i3}})\in E$, 且 $\forall v_{a_{ij}}=v_{a_x}, (v_{a_{ij}},v_{\bar{a_x}})\in E$. (也就是 $V_2$ 内两两相连形成三角, 共轭对 $V_1$ 内相反的两个相连, $V_2$ 内的每一个变量找到 $V_1$ 中共轭的与之相连)
+		
+		由于 $|V_1|=2m,|V_2|=3n$, 所以一共 $m+6n$ 条边.
+		
+		先证明对于可满足的 $s\in\neq\text{SAT}$, 取一组赋值 $v(a_i)\in\{0,1\}$, 将 $f(s)=\langle G,m+5n\rangle$ 的 $G$ 中所有 $v(a_i)=1$ 的点 $v_{a_i}$ 为一组 $S$, $v(a_i)=0$ 的点 $v_{a_i}$ 为另一组 $T$. 记 $S$ 与 $T$ 之间的边集 (割集) 为 $C$
+		
+		则对于 $(v_{ai},v_{\bar{a_i}})\in C$, $(v_{a_{ij}},v_{\bar{a_x}})\in C$  (因为两者必然赋值相反), $(v_{a_{i1}},v_{a_{i2}}),(v_{a_{i1}},v_{a_{i3}}),(v_{a_{i2}},v_{a_{i3}})$ 三条边因为形成环, 不可能三个点的赋值均不同, 由 $\neq\text{SAT}$ 的性质, 三条边有且仅有两条 $\in C$.
+
+		所以如此对 $G$ 进行划分后, 跨越边大小 $|C|=m+3n+2n=m+5n$ 符合条件.
+		
+		\textcircled{3} 反之, 对于一共 $m+6n$, 有 $m+5n$ 的割的图 $G$, 由于一共 $n$ 个三角回路, 而对于任意划分, 三条边最多可能有两条边在割集中. 所以 $(v_{ai},v_{\bar{a_i}})\in C$, $(v_{a_{ij}},v_{\bar{a_x}})\in C$, 对于相反的 $a_i,\bar{a_i}$, 其在割集中必然不在一个集合中, 所以每个相同的 $a_i$ 均在同一集合内. 这对应了一组划分 $V=S\cup T,S\cap T=\emptyset$, 将 $v_{a_i}\in S$ 对应的值 $a_i$ 赋值为真, $v_{a_i}\in T$ 对应的值 $a_i$ 赋值为假, 由相同的 $a_i$ 均在同一集合内, 且相反的 $a_i$ 均不在同一集合内, 该赋值为良定义.
+		
+		而且对于一个括号内的三元组 $a_{i1},a_{i2},a_{i3}$, 因为只有两条边在割集内, 其必然有且仅有 $1$ 或 $2$ 个为真, 符合 $\neq\text{SAT}$ 的条件.
+		
+		由于规约的方式为扫描每一个括号内的三元组并进行连边操作, 所以时间复杂度为 $O(n)$, 为多项式规约.
+		
+		综上, $\neq\text{SAT}$ is $\NPC$.
+	\end{answer}
+	\begin{problem}{2.(16 points)}
+		A language is called unary if every string in it is the form $1^i$ (the string of $i$ ones) for some $i > 0$. Show that if there exists an $\NP$-complete unary language, then $\NP = \mP$. 
+		
+		Hint: If there is a $n^c$ time reduction from 3SAT to a unary language $L$, then this reduction can only map size $n$ instances of 3SAT to some string of the form $1^i$ where $i \le n^c$. Use this observation to obtain a polynomial-time algorithm for 3SAT using the downward self-reducibility argument of Theorem 2.18 in our textbook.
+	\end{problem}
+	\begin{answer}
+		若存在一元 $\NPC$ 语言, 则存在多项式时间规约 $f:\text{3SAT}\rightarrow L$, 对于 $w\in\text{3SAT}\Leftrightarrow f(w)\in L$
+		
+		对于 $w\in\text{3SAT}$ 且 $|w|=n$, 所以 $|f(w)|\leq n^c$.
+		
+		然后对于 CNF $w_0$, 分别对其第 $1$ 到 $n$ 个变量进行赋值 $0$ 和 $1$, 得到 $2^n$ 个 CNF, 但是每次赋值后得到 $w_i$ 后运算 $f(w_i)$, 若已经存在 $w_j$, $f(w_i)=f(w_j)$ 则只保留一个, 一共不超过 $n^c$ 个.
+		
+		所以最后一共会剩下 $n^c$ 个 CNF, 只需依次判断是否其对应的 unary language 是否符合就可以. 时间复杂度为多项式.
+		
+		所以找到了一个多项式时间复杂度解决 SAT 的算法.
+	\end{answer}
+	\begin{problem}{3.(16 points)}
+		Prove that the following language SPACETM is $\PSPACEC$:
+		\begin{align*}
+			\textbf{SPACETM} = \{ \left\langle M, w, 1^n \right\rangle\mid\text{ DTM $M$ accepts $w$ in space $n$ }\}.
+		\end{align*}
+	\end{problem}
+	\begin{answer}
+		\textcircled{1} 对于 $L=\langle M, w, 1^n \rangle\in\textbf{SPACETM}$, 其限制了 $M$ 的运行空间, 所以对于判定机 $M^\prime$, 只需模拟 $M$ 的运行即可, 所以 $L\in\PSPACE$.
+		
+		\textcircled{2} 令 $L$ 为 $\NP$ 中的一个语言.
+		
+		下面构造一个多项式时间规约函数 $f:L\rightarrow\textbf{SPACETM}$, 使得 $w\in L\Leftrightarrow f(w)\in \textbf{SPACETM}$
+		
+		对于 $L\in\PSPACE$, 存在图灵机 $M_L$, $M_L$ 可以在 $n^k$ 空间内判定 $L$.
+		
+		故令 $f(W)=\langle M_L,w,1^{n^k}\rangle,w\in L$. 由于长度固定, 则为多项式规约. $w\in L\Leftrightarrow f(w)\in \textbf{SPACETM}$.
+		
+		所以 SPACETM is $\PSPACEC$.
+	\end{answer}
+	\begin{problem}{4.(16 points)}
+		The class DP is defined as the set of language $L$ for which there are two language $L_1 \in \NP, L_2 \in \coNP$  such that $L = L_1 \cap L_2$. (Don't confuse DP with $\NP\cap \coNP$, which may seem superficially similar.) Show that:
+		\begin{itemize}
+			\item (6 points) $\text{EXACT INDSET} \in \text{DP}$.
+			\item (10 points) Every language in $\text{DP}$ is polynomial-time reducible to $\text{EXACT INDSET}$.
+		\end{itemize}
+	\end{problem}
+	\begin{answer}
+		(1) 首先定义类 $\text{INDSET}=\{L\mid L=\langle G,k\rangle,\text{G has an independent set at least size }k.\}$, 由于 $\langle G,k\rangle$ 的一组证书是 $G$ 的一组独立集, 所以 $\text{INDSET}\in\NP$.
+		
+		对于 $L=\langle G,k\rangle\in\text{EXACT INDSET}$, 
+		
+		定义 $L_1=\{w\mid w=\langle G,k\rangle,\text{G has an independent set at least size }k.\}$, 所以 $L_1\in\NP$
+		
+		定义 $L_2=\{w\mid w=\langle G,k\rangle,\text{G has no independent set greater than }k.\}$, 由于 $\bar{L_2}=\{w\mid w=\langle G,k\rangle,\\\text{G has an independent set at least size }k+1.\}$, $\bar{L_2}\in\NP$, 所以 $L_2\in\coNP$.
+		
+		且 $L_1\cap L_2=\{w\mid w=\langle G,k\rangle,\text{G has an independent sized }k.\}=\text{EXACT INDSET}$
+		
+		$\therefore \text{EXACT INDSET}\in\text{DP}$
+		
+		(2) \textcircled{1} 首先证明 $\text{EXACT INDSET}$ 为 \textbf{NP}-hard 和 \textbf{coNP}-hard.
+		
+		对于任意 $L\in\NP$, 存在多项式规约 $f:L\rightarrow 3SAT$, 也存在多项式规约 $g:3SAT$$\rightarrow\text{EXACT INDSET}$, 对于输入 $CNF=\bigwedge\limits_{i=1}^{n}(x_{i1}\vee x_{i2}\vee x_{i3})$, $g(CNF)=\langle G,n\rangle$ 每一个 clause 对应 $7$ 个点, 分别对应一个 clause 的 $7$ 组赋值, 将互相矛盾的两个点和 $7$ 元组内的点两两相连, 如果有一组解的话对应的点必然为独立集, 且没有 $n+1$ 独立集 (若有则必然组内有点相连, 矛盾) 反之没有 $n$ 独立集. 又 $g$ 为多项式规约, 所以 EXACT INDSET 为 \textbf{NP}-hard.
+		
+		同理, 对于任意 $L\in\coNP$, 存在多项式规约 $f:L\rightarrow \bar{3SAT}$, 也存在多项式规约 $g:\bar{3SAT}$$\rightarrow\text{EXACT INDSET}$, 对于输入 $CNF=\bigwedge\limits_{i=1}^{n}(x_{i1}\vee x_{i2}\vee x_{i3})$, $g(CNF)=\langle G,n-1\rangle$ 每一个 clause 对应 $7$ 个点, 分别对应一个 clause 的 $7$ 组赋值, 将互相矛盾的两个点和 $7$ 元组内的点两两相连, 同时在图中添加一个不连通的 $n-1$ 的独立集, 这样就可以保证最大的独立集大小为 $n-1$, 所以对于输入 $\text{EXACT INDSET}$ 为 \textbf{coNP}-hard.
+		
+		\textcircled{2} 对于 $L\in\text{DP}$, 要找多项式时间规约 $f:L\rightarrow\text{EXACT INDSET}$.
+		
+		由于 $L\in\text{DP}$, 所以 $\exists L_1\in\NP,L_2\in\coNP,L=L_1\cap L_2$.
+		
+		$\therefore\exists f_1:L_1\rightarrow\text{EXACT INDSET},f_2:L_2\rightarrow\text{EXACT INDSET}$
+		
+		对于 $w\in L$, $f_1(w)=\langle G_1,k_1\rangle$, $f_2(w)=\langle G_2,k_2\rangle$, 则令 $f(w)=\langle (n_2+1)G_1+G_2,k_1(n_2+1)+k_2\rangle$, $f(w)$ 满足条件当且仅当 $f_1(w)$ 满足条件. 
+		
+		所以 EXACT-INDSET is DP-complete.
+	\end{answer}
+	\begin{problem}{5.(16 points)}
+		Show that the following language is $\NLC$:
+		\begin{align*}
+			\{ \left\langle G\right\rangle \mid G \text{ is strongly connected digraph}\}.
+		\end{align*}
+	\end{problem}
+	\begin{answer}
+		\textcircled{1} 对于强联通图 $G$, 其 certificate 为按照点标号增序的每两个点之间的路径 $l_{i,j},i,j\in V$. 存在一个 DTM $M$, 对于输入 $G$ 和 $l_{i,j}$, 从左到右扫一遍 certificate, 在判断路径是否存在的同时判断序号是不是正确的 (也就是输入合不合法). 每次在 workspace 中存下现在正在判断的两个点, 然后每次存一个点, 判断路径, 再存下一个点. 所以 $M$ 可以判定 $G$, $G\in\NL$.
+		
+		\textcircled{2} 令 $L=\{ \left\langle G\right\rangle \mid G \text{ is strongly connected digraph}\}.$
+		
+		下面构造一个对数空间规约函数 $f:\text{PATH}\rightarrow L$.
+		
+		对于 $\langle G,s,t\rangle\in\text{PATH},G=\langle V,E\rangle$, 构造 $f(\langle G,s,t\rangle)=G^\prime=\langle V,E^\prime\rangle$. 满足 $E^\prime=E\cup\{(v,s)\mid v\in V\}\cup\{(t,v)\mid v\in V-\{S\}\}$
+		
+		如果 $\langle G,s,t\rangle$ 可满足, 即存在 $s$ 到 $t$ 的路径, 则 $\forall i,j\in V,(i,s),(s,t),(t,j)\in E$, 所以 $i,j$ 连通, 所以 $G^\prime$ 为强联通图. 反之若不存在 $s$ 到 $t$ 的路径, 则 $G^\prime$ 不为强联通图.
+		
+		而规约的过程首先将 $E$ 每条边复制到 $E^\prime$, 然后 workspace 中存储两个节点 $i,j$. 先固定 $j=s$, 遍历 $i\in V$, 连接 $i,j$, 再固定 $i=t$, 遍历 $j\in V-\{S\}$, 连接 $i,j$. 总共用空间不超过 $2\log |E|\sim O(\log n)$.
+		
+		所以 $L$ is $\NLC$.
+	\end{answer}
+	\begin{problem}{6.(20 points)}
+		Prove that in the certificate deinifion of $\NL$, if we allow the verifier machine to move its head back and forth on the certificate, then the class being defined changes to $\NP$.
+	\end{problem}
+	\begin{answer}
+		令 $NL^*=\{w\mid\text{exists a log space vertifier TM and READ MORE THAN ONCE certificate}\}$, 即证 $NL^*=NP$
+		
+		\textcircled{1} 下证 $NL^*\subseteq NP$
+	
+		由于 poly-time verifier 可以模拟 log-space verifier, 所以成立.
+		
+		\textcircled{2} 下证 $NP\subseteq NL^*$
+		
+		对于任意 $L\in\NP$, 存在 NDTM $M$ 判定 $L$, 取 $M$ 的 configuration map, 取 log-space verifier $M^\prime$ , 其 certificate 为 map 上的一系列格局 $c_0,c_1,\cdots,c_n$, $M^\prime$ 先检查 $c_0$ 是否为 $c_{start}$, $c_n$ 是否为 $c_{end}$, 和 $(c_i,c_{i+1})\in\delta$. 由于 $L\in\NP$, 所以 $|c_i|=n^k$, 所以需要不断读取格局的一部分和转移函数的一部分进行比对.
+	\end{answer}
+\end{document}

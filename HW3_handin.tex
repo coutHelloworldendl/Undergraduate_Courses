@@ -1,0 +1,206 @@
+\documentclass[11pt]{article}
+\usepackage[UTF8]{ctex}
+\usepackage[a4paper]{geometry}
+\geometry{left=2.0cm,right=2.0cm,top=2.5cm,bottom=2.5cm}
+
+\usepackage{comment}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{diagbox}
+\usepackage{amsmath,amsfonts,graphicx,amssymb,bm,amsthm}
+%\usepackage{algorithm,algorithmicx}
+\usepackage[ruled]{algorithm2e}
+\usepackage[noend]{algpseudocode}
+\usepackage{fancyhdr}
+\usepackage{tikz}
+\usepackage{graphicx}
+\usetikzlibrary{arrows,automata}
+\usepackage{hyperref}
+\usepackage{float}
+\usepackage{tikz}
+\usepackage{tikz-qtree}
+
+\setlength{\headheight}{14pt}
+\setlength{\parindent}{0 in}
+\setlength{\parskip}{0.5 em}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem*{definition*}{Definition}
+\newcommand{\mP}{\mathbf{P}}
+\newcommand{\NP}{\mathbf{NP}}
+
+\newenvironment{problem}[2][Problem]{\begin{trivlist}
+		\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\hfill$\blacktriangleleft$\end{trivlist}}
+\newenvironment{answer}[1][Answer]{\begin{trivlist}
+		\item[\hskip \labelsep {\bfseries #1.}\hskip \labelsep]}{\hfill$\lhd$\end{trivlist}}
+
+\begin{document}
+	\pagestyle{fancy}
+	\lhead{Peking University}
+	\chead{}
+	\rhead{Introduction to the Theory of Computation, 2024 Spring}
+	\begin{center}
+		{\LARGE \bf Homework 3}\\
+		{Due: 2024-4-22 23:59 \quad$|$\quad 6 Problems, 100 Pts}
+		{Name: 胡宇阳, ID: 2200013065}
+	\end{center}
+	\begin{problem}{1.(18 points)}
+		Prove that the following language is in $\mP$.
+		
+		\textbf{Horn-statisfiability}:
+		\begin{align*}
+			\text{CNF}_H = \{ \left\langle\phi\right\rangle \mid \phi \text{ is a Horn formula}\}
+		\end{align*}
+		A Horn clause is a clause with at most one postive literal and any number of negative literals. A Horn formula is a propositional formula formed by conjunctions of Horn clauses.
+	\end{problem}
+	\begin{answer}
+		给定 $CNF_H=\bigwedge\limits_{i=1}^{m}\left(\bigvee\limits_{j=1}^{n_i}{a_{ij}}\right)$
+		
+		存在一个多项式时间算法 $M$ 运行如下:
+		$M=$ 对输入 $CNF_H$,
+		
+		循环执行以下操作:
+		遍历一遍所有变量, 若每一个括号内都有 negative literals, 则所有变量赋值 $0$.
+		
+		否则, 存在一个 clause 只有一个 positive literal $x$. 则将这个 $x$ = true, 并修改每个 clause 的值, 有 $x$ 的 clause 删除, 有 $\bar{x}$ 的删除其中的 x. 若存在 clause 只有一个 $\bar{x}$, 则返回 reject.
+		
+		由于算法有边界, 且最多执行次数即为变量数 $n$, 每次扫一遍, 所以时间复杂度为 $O(n^2)\in \mP$
+	\end{answer}
+	\begin{problem}{2.(14 points)}
+		Suppose $L_1, L_2 \in \NP$. Then is $L_1 \cap L_2 \in \mathbf{NP}$? What about $L_1 \cup L_2$?
+	\end{problem}
+	\begin{answer}
+		(1) 因为 $L_1,L_2\in\NP$, 所以存在验证机 $TM_1,TM_2$ 和证书 $C_1,C_2$, $TM_1$ 在多项式内验证 $<L_1(s),C_1(s)>$, $TM_2$ 在多项式内验证 $<L_2(s),C_2(s)>$. 设验证时间 $T_1\leq cn^{k_{1}},T_2\leq cn^{k_2}$
+		
+		由于证书一定要扫一遍, 而图灵机每一次移动只能动一格, 所以 $|C_1(s)|\leq cn^{k_{1}}$
+		
+		则我们可以构造一个图灵机 $TM$ 和证书 $C$, 满足 $C(s)=C_1(s)+*+C_2(s)$, 也就是将证书后面补字符*)
+		
+		图灵机执行以下操作:
+		对于输入字符串 $s$, 计算长度 $n=|s|$, 然后用 $*$ 将其证书分开为 $C_1(s),C_2(s)$, 然后分别模拟 $TM_1(s,C_1(s)),TM_2(s,C_2(s))$, 若均成立则返回 accept. 若不在 $L_1 \cap L_2$, 则至少有一个没有证书, 且不存在证书使得 accept. 所以 $TM$ 判别 $L_1 \cap L_2$.
+		
+		因为只需要遍历一遍证书, 然后分别模拟, 所以时间复杂度仍为 $O(n^{k_{1}}+n^{k_2})\in \mP$
+		
+		(2) 同理, 构造一个图灵机 $TM$ 和证书 $C$, 满足 $C(s)=C_1(s)+*+C_2(s)$, 也就是将证书后面补字符*), 若其中一个证书不存在则记录为 $0$.
+		
+		图灵机执行以下操作:
+		对于输入字符串 $s$, 计算长度 $n=|s|$, 然后用 $*$ 将其证书分开为 $C_1(s),C_2(s)$, 然后看证书是否有 $0$, 因为 $s\in L_1 \cup L_2$, 所以 $C_1(s),C_2(s)$ 至少一个不为 $0$. 不妨设 $C_1(s)\neq 0$. 模拟 $TM_1(s,C_1(s))$, 若均成立则返回 accept. 
+		
+		因为只需要遍历一遍证书, 然后进行模拟, 所以时间复杂度仍为 $O(\max(n^{k_{1}},n^{k_2}))\in\mP$
+	\end{answer}
+	\begin{problem}{3.(12 points)}
+		Prove that \[L = \{w \mid w \text{ is a binary representation of a prime number}\}\in \NP\]
+		\emph{Tips: A natural number $n$ is a prime number if and only if for any prime factor $p$ of $n-1$, there exists an $a \in \{2, \cdots, n-1\}$ such that $a^{n-1}  = 1 \bmod n$ and $a^{(n-1)/p} \neq 1 \bmod n$.}
+	\end{problem}
+	\begin{answer}
+		对于素数 $k$, 递归定义其证书 $C(k)=[x_1,a_1,c(x_1)],[x_2,a_2,c(x_2)]\cdots,[x_{n_k},a_{n_k},c(x_{n_k})]$.
+		
+		其中 $x_i$ 为 $k$ 的所有素因子, $a_i$ 为满足判断素数条件的 $a$, $c(x_i)$ 为 $x_i$ 的证书, 若 $x_i=2$ 则 $c(x_i)=\emptyset$.
+		
+		定义验证机 $TM$ 如下:
+		对于输入数字 $k$ 和证书 $[x_1,a_1,c(x_1)],[x_2,a_2,c(x_2)]\cdots,[x_{n_k},a_{n_k},c(x_{n_k})]$.
+		
+		\textcircled{1} 遍历一遍证书, 检查数字是否以 $[]$ 和 $,$ 进行分割, 括号位置是否正确, 并将 $k$ 反复依次除以 $x_1\sim x_{n_k}$ 直到不能整除为止. 若有一项不符合则 reject.
+		
+		\textcircled{2} 从头开始判断, 在判断到第 $i$ 步时假设此时三元组为 $[x_i,a_i,c(x_i)]$. 则递归调用验证机 $TM(x_i,c(x_i))$, 所有检查均通过后则 accept, 否则 reject.
+		
+		则由于 hint 的结论为充要条件, 所有素数均有 certificate, 而合数均不存在 certificate.
+		
+		下证 $TM$ 可以在多项式时间内判断 $k$:
+		
+		\textcircled{1} 对于 $x\geq 2$, 令 $x$ 的质因数分解 $x=x_1^{n_1}x_2^{n_2}\cdots x_m^{n_m}$, 则 $\log(x)=n_1\log(x_1)+n_2\log(x_2)+\cdots+n_m\log(x_m)\geq \log(x_1)+\log(x_2)+\cdots+\log(x_m)\geq m$. (由于最小的质数为 $2$)
+		
+		所以质因数数量 $\leq\log(x)$, 长度 $\leq\log^2(x)$.
+		
+		对于 certificate 的长度 $L(x)$ 有 $L(x)\leq2\log^2(x)+\sum\limits_{p\mid x-1}L(p)$
+		
+		下证 $L(x)\leq8\log^3(x)$:
+		
+		首先对于 $x=2$ 成立.
+		
+		若对 $x<k$ 的 $x$ 均成立, 由于 $x$ 为奇数, 则 $L(k)\leq2\log^2(k)+\sum\limits_{p\mid x-1}L(p)$
+		
+		$\leq2\log^2(k)+\sum\limits_{p\mid x-1,p>2}L(p)+L(2)$
+		
+		$\leq2\log^2(k)+\sum\limits_{p\mid x-1,p>2}8\log^3(p)+3$
+		
+		$\leq2\log^2(k)+8\log^3(\frac{k}{2})+3$
+		
+		$\leq8\log^3(k)$, 所以归纳结论成立.
+		
+		由于验证机运行时间分为检查合法性, 递归检查素数, 检查素因子, 检查 $a_i$这四步. 所以验证素数的时间为 $T(x)\leq 8\log^3(x)+\sum\limits_{p\mid x-1}T(p)+log^2(x)+2log(x)\leq 11\log^3(x)+\sum\limits_{p\mid x-1}T(p)$, 同理, $T(x)\sim O(c\log^4(x))\in\mP$
+		
+		所以 $TM$ 为多项式时间图灵机.
+	\end{answer}
+	\begin{problem}{4.(14 points)}
+		Let \textbf{HALT} be the Halting language. Show that \textbf{HALT} is $\NP$-hard. Is it $\NP$-complete? 
+	\end{problem}
+	\begin{answer}
+		对于语言 $L$, $A\in L$, 存在 $NTM$ $M$ 使得 $M$ 在多项式时间内搜索 $A$ 的证书并判定 $A$. 若 $A\notin L$, 则 $M$ 不停机.
+		
+		所以可以有多项式规约函数 $f(A)=<M,A>$ 满足 $A\in L\Rightarrow <M,A>\in \textbf{HALT}$, $A\notin L\Rightarrow <M,A>\notin \textbf{HALT}$.
+		
+		通过 $L$ 来构造搜索证书的图灵机是多项式的, 所以 $f$ 为多项式规约.
+		
+		所以 \textbf{HALT} 为 $\NP$-complete.
+		
+		\textbf{HALT} 不是 $\NP$ 因为 \textbf{HALT} 不可判定.
+	\end{answer}
+	\begin{problem}{5.(14 points)}
+		Show that, if $\NP = \mP$, then every language $A \in \mP$, except $A = \varnothing$ and $A = \Sigma^*$, is $\NP$-complete.
+	\end{problem}
+	\begin{answer}
+		对于语言 $S\in\NP,A\in\mP$, 由于 $A\neq\emptyset \wedge A\neq \Sigma^*$, 取 $v\in A,w\notin A$, 定义规约函数 $f(s)=\begin{cases}
+			v & s\in S \\
+			w & s\notin S \\
+		\end{cases}$
+		
+		则 $s\in S\Leftarrow f(s)\in A$, 由于 $\mP=\NP$, 则 $s\in S$ 可以在多项式时间内判定. 所以 $f$ 为多项式时间可规约函数, 所以 $S$ 是 $\NP$-hard, 又 $P=NP$, S 是 $\NP$-complete.
+	\end{answer}
+	\begin{problem}{6.(28 points)}
+		Let $\phi$ be a 3-CNF. An $\neq$-assignment to the variables of $\phi$ is one where each clause contains two literals with unequal truth values. In other words, an $\neq$-assignment satisfies $\phi$ without assigning three true literals in any clauses.
+		\begin{itemize}
+			\item Show that the negation of any $\neq$-assignment to $\phi$ is also an $\neq$-assignment.
+			\item let $\neq$-SAT be the collection of 3CNFs that have an $\neq$-assignment. Show that we obtain a polynomial-time reduction from 3SAT to $\neq$-SAT by replacing each clause 
+			\begin{align*}
+				c_i = (y_1 \lor y_2 \lor y_3)
+			\end{align*}
+			with the two clauses
+			\begin{align*}
+				(y_1 \lor y_2 \lor z_i) \quad \text{and} \quad (\overline{z}_i \lor y_3 \lor b)
+			\end{align*}
+			where $z_i$ is a new variable for each clause $c_i$ and $b$ is a single addtional new variable.
+			\item Conclude that $\neq$-SAT is $\NP$-complete. 
+		\end{itemize}
+	\end{problem}
+	\begin{answer}
+		(1) 取 3-CNF $\phi=\bigwedge\limits_{i=1}^{n}(a_{i1}\vee a_{i2}\vee a_{i3})$, 其中 $a_{ij}$ 可以为 positive 也可以 negative.
+		
+		则 $\bar{\phi}=\bigwedge\limits_{i=1}^{n}(\bar{a_{i1}}\vee\bar{a_{i2}}\vee\bar{a_{i3}})$
+		
+		若 $\neq$-assignment satisfies $\phi$, 则对于其中一个 clause $(a_{i1}\vee a_{i2}\vee a_{i3})$, 其中为真的 value 为 1 或 2 个. 所以在 $\bar{\phi}$ 中对应的 $(\bar{a_{i1}}\vee\bar{a_{i2}}\vee\bar{a_{i3}})$ 为真的 value 也为 1 或 2 个. 所以 $\bar{\phi}$ 是 $\neq$-assignment 的.
+		
+		(2) \begin{table}[H]
+			\centering
+			\begin{tabular}{|c|c|c|c|c|c|c|} \hline
+				$y_1$ & $y_2$ & $y_3$ & $z_i$ & $b$ & $(y_1 \lor y_2 \lor z_i)$ & $(\overline{z}_i \lor y_3 \lor b)$ \\ \hline 
+				$0$ & $0$ & $1$ & $1$ & $0$ & $1$ & $1$ \\ \hline 
+				$0$ & $1$ & $0$ & $0$ & $0$ & $1$ & $1$ \\ \hline 
+				$0$ & $1$ & $1$ & $0$ & $0$ & $1$ & $1$ \\ \hline 
+				$1$ & $0$ & $0$ & $0$ & $0$ & $1$ & $1$ \\ \hline 
+				$1$ & $0$ & $1$ & $0$ & $0$ & $1$ & $1$ \\ \hline 
+				$1$ & $1$ & $0$ & $0$ & $0$ & $1$ & $1$ \\ \hline 
+				$1$ & $1$ & $1$ & $0$ & $0$ & $1$ & $1$ \\ \hline 
+			\end{tabular}
+		\end{table}
+		
+		(3) 由于 3-CNF 为 $\NP$-complete, 而 3-CNF $\leq_P$ $\neq$-SAT, 所以 $\neq$-SAT 为 $\NP$-hard.
+		
+		对于满足 $\neq$-SAT, 其证书为一组变量的赋值, 而图灵机只需要检查赋值是否符合布尔变量条件, 并检查是否有一个 clause 内三个变量同时成立即可, 只需要扫一遍整个 clause 即可. 所以检验的时间复杂度为多项式, 所以 $\neq$-SAT 为 $\NP$-complete.
+	\end{answer}
+\end{document}
